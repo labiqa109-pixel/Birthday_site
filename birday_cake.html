@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Happy Birthday</title>
+
+<style>
+body{
+  margin:0;
+  background:black;
+  overflow:hidden;
+  font-family:Arial;
+  text-align:center;
+  color:white;
+}
+
+/* Heading */
+h1{
+  margin-top:20px;
+  font-size:40px;
+  color:#ff4da6;
+}
+
+/* Cake */
+.cake{
+  font-size:120px;
+  margin-top:80px;
+}
+
+/* Candles */
+.candles{
+  font-size:40px;
+}
+
+/* Button */
+button{
+  padding:10px 20px;
+  margin:10px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+/* Sparkles */
+.sparkle{
+  position:absolute;
+  width:5px;
+  height:5px;
+  background:white;
+  animation:fall linear infinite;
+  border-radius:50%;
+}
+
+@keyframes fall{
+  0%{transform:translateY(-10px); opacity:1;}
+  100%{transform:translateY(100vh); opacity:0;}
+}
+</style>
+</head>
+
+<body>
+
+<h1>Happy Birthday Ladlee!!</h1>
+
+<div class="candles" id="candles">🕯️🕯️🕯️</div>
+
+<div class="cake">🍫🎂🍫</div>
+
+<p id="msg"></p>
+
+<button onclick="lightCandles()">Light Candles</button>
+<button onclick="startBlow()">Blow with Mic</button>
+<button onclick="cutCake()">Cut Cake</button>
+
+<audio id="song" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+
+<script>
+// -------- Sparkles --------
+setInterval(()=>{
+  let s=document.createElement("div");
+  s.className="sparkle";
+  s.style.left=Math.random()*window.innerWidth+"px";
+  s.style.animationDuration=(2+Math.random()*3)+"s";
+  document.body.appendChild(s);
+  setTimeout(()=>s.remove(),5000);
+},200);
+
+// -------- Candles --------
+let lit=false;
+function lightCandles(){
+  document.getElementById("candles").innerHTML="🔥🔥🔥";
+  lit=true;
+  document.getElementById("msg").innerText="Candles are ON now";
+}
+
+// -------- Mic Blow --------
+function startBlow(){
+  if(!lit){
+    alert("Pehle candles light karo");
+    return;
+  }
+
+  navigator.mediaDevices.getUserMedia({audio:true})
+  .then(stream=>{
+    let audioContext = new AudioContext();
+    let mic = audioContext.createMediaStreamSource(stream);
+    let analyser = audioContext.createAnalyser();
+    mic.connect(analyser);
+
+    let data = new Uint8Array(analyser.frequencyBinCount);
+
+    let check=setInterval(()=>{
+      analyser.getByteFrequencyData(data);
+      let volume = data.reduce((a,b)=>a+b)/data.length;
+
+      if(volume>20){
+        document.getElementById("candles").innerHTML="💨💨💨";
+        document.getElementById("msg").innerText=
+        "Happy Birthday Mery Babu Goshayy🫂🥹!!";
+
+        document.getElementById("song").play();
+
+        clearInterval(check);
+      }
+    },200);
+  });
+}
+
+// -------- Cake Cut --------
+function cutCake(){
+  let piece = window.location.origin + window.location.pathname + "?slice=1";
+
+  document.getElementById("msg").innerHTML=
+  "Cake cut ho gaya 🎂 Share this piece: <br>" + piece;
+}
+</script>
+
+</body>
+</html>
+
+const urlParams = new URLSearchParams(window.location.search);
+const slice = urlParams.get("slice");
+
+if(slice){
+  document.body.innerHTML = `
+    <h1 style="color:pink;">Your Cake Piece 🎂</h1>
+    <div style="font-size:120px;">🍰</div>
+    <p>You got a special slice of birthday cake!</p>
+  `;
+}
